@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Register - Portfolio System{% endblock %}
+
+{% block content %}
+<div class="auth-form">
+    <h2>Create Account</h2>
+    
+    <form action="{{ url_for('auth.register') }}" method="POST">
+        <div class="form-row">
+            <div class="form-group">
+                <label for="first_name">First Name:</label>
+                <input type="text" id="first_name" name="first_name" 
+                       value="{{ form.first_name or '' }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="last_name">Last Name:</label>
+                <input type="text" id="last_name" name="last_name" 
+                       value="{{ form.last_name or '' }}" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" 
+                   value="{{ form.username or '' }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" 
+                   value="{{ form.email or '' }}" required>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+                <small>Minimum 8 characters</small>
+            </div>
+
+            <div class="form-group">
+                <label for="confirm_password">Confirm Password:</label>
+                <input type="password" id="confirm_password" name="confirm_password" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="role">I am a:</label>
+            <select id="role" name="role" required>
+                <option value="">-- Select Role --</option>
+                <option value="student" {% if form.role == 'student' %}selected{% endif %}>Student</option>
+                <option value="teacher" {% if form.role == 'teacher' %}selected{% endif %}>Teacher</option>
+            </select>
+        </div>
+
+        <!-- Optional fields based on role -->
+        <div class="form-group" id="grad_year_group" style="display: none;">
+            <label for="grad_year">Graduation Year (optional):</label>
+            <input type="number" id="grad_year" name="grad_year" 
+                   min="2020" max="2030" value="{{ form.grad_year or '' }}">
+        </div>
+
+        <div class="form-group" id="department_group" style="display: none;">
+            <label for="department">Department (optional):</label>
+            <input type="text" id="department" name="department" 
+                   value="{{ form.department or '' }}">
+        </div>
+
+        <button type="submit" class="btn btn-primary">Register</button>
+    </form>
+
+    <p class="auth-link">
+        Already have an account? <a href="{{ url_for('auth.login') }}">Login here</a>
+    </p>
+</div>
+
+<script>
+// Show/hide optional fields based on role selection
+document.getElementById('role').addEventListener('change', function() {
+    const role = this.value;
+    const gradYearGroup = document.getElementById('grad_year_group');
+    const departmentGroup = document.getElementById('department_group');
+    
+    if (role === 'student') {
+        gradYearGroup.style.display = 'block';
+        departmentGroup.style.display = 'none';
+    } else if (role === 'teacher') {
+        gradYearGroup.style.display = 'none';
+        departmentGroup.style.display = 'block';
+    } else {
+        gradYearGroup.style.display = 'none';
+        departmentGroup.style.display = 'none';
+    }
+});
+</script>
+{% endblock %}

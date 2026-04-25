@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Teacher Dashboard - Portfolio System{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <h2>Teacher Dashboard</h2>
+    <p class="note">Welcome, {{ session.get('first_name') }}!</p>
+
+    <div class="teacher-links">
+        <a href="{{ url_for('portfolios.teacher_all') }}" class="btn btn-primary">View All Student Portfolios</a>
+    </div>
+
+    <p class="note">Note: Grading functionality coming soon!</p>
+</div>
+{% endblock %}

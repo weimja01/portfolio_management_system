@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}{{ portfolio.title }} - Portfolio System{% endblock %}
+
+{% block content %}
+<div class="portfolio-view">
+    <div class="portfolio-header">
+        <h2>{{ portfolio.title }}</h2>
+        <p class="portfolio-owner">By {{ portfolio.first_name }} {{ portfolio.last_name }}</p>
+        {% if portfolio.description %}
+            <p class="portfolio-description">{{ portfolio.description }}</p>
+        {% endif %}
+    </div>
+
+    <!-- Student-only edit controls -->
+    {% if session.get('role') == 'student' and portfolio.student_id == session.get('user_id') %}
+    <div class="portfolio-actions">
+        <a href="{{ url_for('portfolios.edit', portfolio_id=portfolio.portfolio_id) }}" 
+           class="btn btn-secondary">Edit Info</a>
+        
+        <form action="{{ url_for('portfolios.delete', portfolio_id=portfolio.portfolio_id) }}" 
+              method="POST" style="display: inline;"
+              onsubmit="return confirm('Delete this portfolio? Artworks will not be deleted.');">
+            <button type="submit" class="btn btn-danger">Delete Portfolio</button>
+        </form>
+    </div>
+    {% endif %}
+
+    <!-- Artworks in Portfolio -->
+    <section class="portfolio-artworks">
+        <h3>Artworks ({{ artworks|length }})</h3>
+        
+        {% if artworks %}
+            <div class="artwork-grid">
+                {% for artwork in artworks %}
+                    <div class="artwork-card">
+                        <div class="artwork-thumbnail">
+                            <img src="{{ url_for('static', filename='uploads/thumb_' + artwork.file_path) }}" 
+                                 alt="{{ artwork.title }}">
+                        </div>
+                        <div class="artwork-info">
+                            <h4>{{ artwork.title }}</h4>
+                            <p class="medium">{{ artwork.medium }}</p>
+                        </div>
+                        <div class="artwork-actions">
+                            <a href="{{ url_for('artworks.detail', artwork_id=artwork.artwork_id) }}" 
+                               class="btn btn-small">View</a>
+                            
+                            {% if session.get('role') == 'student' and portfolio.student_id == session.get('user_id') %}
+                            <form action="{{ url_for('portfolios.remove_artwork', portfolio_id=portfolio.portfolio_id) }}" 
+                                  method="POST" style="display: inline;">
+                                <input type="hidden" name="artwork_id" value="{{ artwork.artwork_id }}">
+                                <button type="submit" class="btn btn-small btn-danger">Remove</button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="empty-state">No artworks in this portfolio yet.</p>
+        {% endif %}
+    </section>
+
+    <!-- Add Artworks (Student only) -->
+    {% if session.get('role') == 'student' and portfolio.student_id == session.get('user_id') and available_artworks %}
+    <section class="add-artwork-section">
+        <h3>Add Artwork to Portfolio</h3>
+        <form action="{{ url_for('portfolios.add_artwork', portfolio_id=portfolio.portfolio_id) }}" 
+              method="POST">
+            <div class="form-group">
+                <select name="artwork_id" required>
+                    <option value="">-- Select artwork to add --</option>
+                    {% for artwork in available_artworks %}
+                        <option value="{{ artwork.artwork_id }}">{{ artwork.title }} ({{ artwork.medium }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Add to Portfolio</button>
+        </form>
+    </section>
+    {% endif %}
+
+    <div class="back-link">
+        <a href="{{ url_for('portfolios.index') }}">&larr; Back to Portfolios</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Student Portfolios - Portfolio System{% endblock %}
+
+{% block content %}
+<div class="teacher-portfolios">
+    <h2>Student Portfolios</h2>
+
+    {% if portfolios %}
+        <div class="portfolio-list">
+            {% for portfolio in portfolios %}
+                <div class="portfolio-item">
+                    <div class="portfolio-info">
+                        <h3>{{ portfolio.title }}</h3>
+                        <p class="student-name">{{ portfolio.first_name }} {{ portfolio.last_name }}</p>
+                        {% if portfolio.description %}
+                            <p class="description">{{ portfolio.description[:100] }}...</p>
+                        {% endif %}
+                        <p class="meta">{{ portfolio.artwork_count }} artworks</p>
+                    </div>
+                    <a href="{{ url_for('portfolios.view', portfolio_id=portfolio.portfolio_id) }}" 
+                       class="btn btn-primary">View Portfolio</a>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="empty-state">No student portfolios yet.</p>
+    {% endif %}
+</div>
+{% endblock %}

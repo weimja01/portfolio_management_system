@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}My Portfolios - Portfolio System{% endblock %}
+
+{% block content %}
+<div class="portfolios-page">
+    <div class="page-header">
+        <h2>My Portfolios</h2>
+        <a href="{{ url_for('portfolios.create') }}" class="btn btn-primary">Create New Portfolio</a>
+    </div>
+
+    {% if portfolios %}
+        <div class="portfolio-grid">
+            {% for portfolio in portfolios %}
+                <div class="portfolio-card">
+                    <h3>{{ portfolio.title }}</h3>
+                    
+                    {% if portfolio.description %}
+                        <p class="portfolio-description">{{ portfolio.description[:150] }}{% if portfolio.description|length > 150 %}...{% endif %}</p>
+                    {% endif %}
+                    
+                    <div class="portfolio-meta">
+                        <span>{{ portfolio.artwork_count }} artworks</span>
+                        <span>Created {{ portfolio.created_date[:10] }}</span>
+                    </div>
+                    
+                    <div class="portfolio-actions">
+                        <a href="{{ url_for('portfolios.view', portfolio_id=portfolio.portfolio_id) }}" 
+                           class="btn btn-small">View</a>
+                        <a href="{{ url_for('portfolios.edit', portfolio_id=portfolio.portfolio_id) }}" 
+                           class="btn btn-small btn-secondary">Edit</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <p>You haven't created any portfolios yet.</p>
+            <a href="{{ url_for('portfolios.create') }}" class="btn btn-primary">Create Your First Portfolio</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

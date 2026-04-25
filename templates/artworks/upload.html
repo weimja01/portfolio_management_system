@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Artwork - Portfolio System{% endblock %}
+
+{% block content %}
+<div class="upload-form">
+    <h2>Upload New Artwork</h2>
+
+    <form action="{{ url_for('artworks.upload') }}" method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="artwork_file">Image File: *</label>
+            <input type="file" id="artwork_file" name="artwork_file" 
+                   accept="image/jpeg,image/jpg,image/png" required>
+            <small>JPG or PNG only, max 10MB</small>
+        </div>
+
+        <div class="form-group">
+            <label for="title">Title: *</label>
+            <input type="text" id="title" name="title" maxlength="200" required>
+        </div>
+
+        <div class="form-group">
+            <label for="medium">Medium: *</label>
+            <select id="medium" name="medium" required>
+                <option value="">-- Select Medium --</option>
+                {% for medium in mediums %}
+                    <option value="{{ medium }}">{{ medium }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="description">Description (optional):</label>
+            <textarea id="description" name="description" rows="4" maxlength="1000"></textarea>
+            <small>Max 1000 characters</small>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Upload Artwork</button>
+            <a href="{{ url_for('student.dashboard') }}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

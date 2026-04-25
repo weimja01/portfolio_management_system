@@ -5,7 +5,7 @@ from datetime import datetime
 
 from flask import (
     Blueprint, request, session, redirect,
-    url_for, render_template, flash, g
+    url_for, render_template, flash, g, make_response
 )
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -325,20 +325,25 @@ def login():
 
 
 @auth_bp.route('/logout', methods=['POST'])
-@login_required
+@login_required  
 def logout():
-    """
-    Securely log the user out.
-
-    POST only (protects against logout CSRF via GET link).
-    Clears the server-side session and redirects to the login page.
-    """
+    """Securely log the user out."""
     user_id = session.get('user_id')
+    
     log_action(user_id, "logout", "User logged out")
-
+    
+    # Clear ALL session data
     session.clear()
-    flash("You have been logged out successfully.", "info")
-    return redirect(url_for('auth.login'))
+    session.modified = False
+    session.permanent = False
+    
+    # Create response
+    response = make_response(redirect(url_for('auth.login')))
+    
+    # Delete session cookie completely
+    response.delete_cookie('session', path='/')
+    
+    return response
 
 
 @auth_bp.route('/dashboard')
@@ -411,7 +416,6 @@ def api_login():
     session['role']       = user['role']
     session['first_name'] = user['first_name']
     session['last_name']  = user['last_name']
-    session.permanent     = True
 
     log_action(user['user_id'], "api_login_success", f"API login from {request.remote_addr}")
 

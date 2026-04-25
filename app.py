@@ -10,7 +10,7 @@ def create_app():
     # -----------------------------------------------------------------------
     # Configuration
     # -----------------------------------------------------------------------
-    app.secret_key = os.environ.get('SECRET_KEY', 'dev-secret-change-in-production')
+    app.secret_key = 'completely-new-random-key-12345'
     app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=2)
 
     # File upload settings
@@ -36,9 +36,43 @@ def create_app():
     from student import student_bp
     app.register_blueprint(student_bp)
 
-    from integration_tests import tests_bp
-    app.register_blueprint(tests_bp)
+    from teacher import teacher_bp
+    app.register_blueprint(teacher_bp)
 
+    # -----------------------------------------------------------------------
+    # Routes
+    # -----------------------------------------------------------------------
+    
+    @app.route('/')
+    def index():
+        from flask import redirect, url_for
+        return redirect(url_for('auth.login'))
+    
+    @app.route('/session-debug')
+    def session_debug():
+        """Debug route to see session contents"""
+        from flask import session
+        
+        session_data = dict(session)
+        
+        html = "<h1>Session Debug</h1>"
+        html += "<h2>Session Data:</h2>"
+        
+        if session_data:
+            html += "<ul>"
+            for key, value in session_data.items():
+                html += f"<li><strong>{key}:</strong> {value}</li>"
+            html += "</ul>"
+        else:
+            html += "<p style='color: green; font-size: 20px;'>✓ Session is EMPTY (not logged in)</p>"
+        
+        html += "<br><hr><br>"
+        html += "<a href='/auth/logout'>Logout</a> | "
+        html += "<a href='/auth/login'>Login</a> | "
+        html += "<a href='/auth/register'>Register</a>"
+        
+        return html
+    
     return app
 
 

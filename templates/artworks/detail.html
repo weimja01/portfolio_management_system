@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}{{ artwork.title }} - Portfolio System{% endblock %}
+
+{% block content %}
+<div class="artwork-detail">
+    <div class="artwork-header">
+        <h2>{{ artwork.title }}</h2>
+        <div class="artwork-meta">
+            <span>By {{ artwork.first_name }} {{ artwork.last_name }}</span>
+            <span>{{ artwork.upload_date[:10] }}</span>
+        </div>
+    </div>
+
+    <div class="artwork-content">
+        <!-- Image -->
+        <div class="artwork-image">
+            <img src="{{ url_for('static', filename='uploads/' + artwork.file_path) }}" 
+                 alt="{{ artwork.title }}">
+        </div>
+
+        <!-- Details -->
+        <div class="artwork-details">
+            <div class="detail-group">
+                <h4>Medium</h4>
+                <p>{{ artwork.medium }}</p>
+            </div>
+
+            {% if artwork.description %}
+            <div class="detail-group">
+                <h4>Description</h4>
+                <p>{{ artwork.description }}</p>
+            </div>
+            {% endif %}
+
+            {% if artwork.grade %}
+            <div class="detail-group">
+                <h4>Grade</h4>
+                <p class="grade-display">{{ artwork.grade }}%</p>
+            </div>
+            {% else %}
+            <div class="detail-group">
+                <p class="pending-grade">Awaiting teacher feedback</p>
+            </div>
+            {% endif %}
+
+            <!-- Student-only actions -->
+            {% if session.get('role') == 'student' and artwork.student_id == session.get('user_id') %}
+            <div class="detail-actions">
+                <form action="{{ url_for('artworks.toggle_public', artwork_id=artwork.artwork_id) }}" 
+                      method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-secondary">
+                        {% if artwork.is_public %}Make Private{% else %}Make Public{% endif %}
+                    </button>
+                </form>
+
+                <form action="{{ url_for('artworks.delete', artwork_id=artwork.artwork_id) }}" 
+                      method="POST" style="display: inline;"
+                      onsubmit="return confirm('Delete this artwork permanently?');">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Teacher Feedback -->
+    <section class="feedback-section">
+        <h3>Teacher Feedback</h3>
+        
+        {% if feedback %}
+            {% for comment in feedback %}
+                <div class="comment">
+                    <div class="comment-header">
+                        <strong>{{ comment.teacher_name }}</strong>
+                        <span class="comment-date">{{ comment.created_at[:10] }}</span>
+                    </div>
+                    <p class="comment-text">{{ comment.comment_text }}</p>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="empty-state">No feedback yet.</p>
+        {% endif %}
+    </section>
+
+    <div class="back-link">
+        <a href="{{ url_for('student.dashboard') }}">&larr; Back to Dashboard</a>
+    </div>
+</div>
+{% endblock %}

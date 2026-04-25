@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Portfolio Management System{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <h1 class="logo">🎨 Portfolio Pro</h1>
+            
+            {% if session.get('user_id') %}
+                <!-- Logged in navigation -->
+                <div class="nav-links">
+                    {% if session.get('role') == 'student' %}
+                        <a href="{{ url_for('student.dashboard') }}">My Dashboard</a>
+                        <a href="{{ url_for('artworks.upload') }}">Upload Artwork</a>
+                        <a href="{{ url_for('portfolios.index') }}">My Portfolios</a>
+                    {% elif session.get('role') == 'teacher' %}
+                        <a href="{{ url_for('teacher.dashboard') }}">Dashboard</a>
+                        <a href="{{ url_for('portfolios.teacher_all') }}">Student Portfolios</a>
+                    {% endif %}
+                    
+                    <span class="user-info">{{ session.get('first_name') }}</span>
+                    
+                    <form action="{{ url_for('auth.logout') }}" method="POST" style="display: inline;">
+                        <button type="submit" class="btn-logout">Logout</button>
+                    </form>
+                </div>
+            {% else %}
+                <!-- Not logged in -->
+                <div class="nav-links">
+                    <a href="{{ url_for('auth.login') }}">Login</a>
+                    <a href="{{ url_for('auth.register') }}">Register</a>
+                </div>
+            {% endif %}
+        </div>
+    </nav>
+
+    <!-- Flash Messages -->
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Main Content -->
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 Art Portfolio Management System</p>
+    </footer>
+</body>
+</html>
