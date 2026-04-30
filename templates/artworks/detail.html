@@ -64,6 +64,35 @@
         </div>
     </div>
 
+    <!-- Teacher Grading Section -->
+    {% if session.get('role') == 'teacher' %}
+    <section class="grading-section" style="margin: 30px 0; padding: 20px; background: #f0f8ff; border-radius: 8px; border-left: 4px solid #3498db;">
+        <h3>Grade This Artwork</h3>
+        <form action="{{ url_for('teacher.grade_artwork', artwork_id=artwork['artwork_id']) }}" method="POST">
+            <div class="form-group">
+                <label for="grade" style="font-weight: bold; display: block; margin-bottom: 8px;">Grade (0-100):</label>
+                <input 
+                    type="number" 
+                    id="grade" 
+                    name="grade" 
+                    min="0" 
+                    max="100" 
+                    value="{{ artwork['grade'] if artwork['grade'] else '' }}"
+                    placeholder="Enter grade"
+                    required
+                    style="width: 150px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 16px;"
+                >
+                <button type="submit" class="btn btn-primary" style="margin-left: 10px;">Submit Grade</button>
+            </div>
+            {% if artwork['grade'] %}
+                <p style="color: #666; font-size: 14px; margin-top: 10px;">
+                    Current grade: <strong style="color: #2ecc71; font-size: 18px;">{{ artwork['grade'] }}%</strong>
+                </p>
+            {% endif %}
+        </form>
+    </section>
+    {% endif %}
+
     <!-- Comments Section -->
     <section class="feedback-section">
         <h3>Comments</h3>

@@ -12,6 +12,14 @@
         {% endif %}
     </div>
 
+ <!-- Add this near the top of the portfolio view -->
+<div style="margin: 20px 0;">
+    <a href="{{ url_for('pdf_exports.export_portfolio', portfolio_id=portfolio['portfolio_id']) }}" 
+       class="btn btn-secondary">
+        📄 Export Portfolio as PDF
+    </a>
+</div>   
+
     <!-- Student-only edit controls -->
     {% if session.get('role') == 'student' and portfolio.student_id == session.get('user_id') %}
     <div class="portfolio-actions">

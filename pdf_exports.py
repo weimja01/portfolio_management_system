@@ -85,7 +85,7 @@ def export_portfolio(portfolio_id):
         FROM portfolio_artworks pa
         JOIN artworks a ON a.artwork_id = pa.artwork_id
         WHERE pa.portfolio_id = ?
-        ORDER BY pa.display_order ASC, pa.added_date ASC
+        ORDER BY a.upload_date DESC
         """,
         (portfolio_id,)
     ).fetchall()
@@ -206,7 +206,7 @@ def export_portfolio(portfolio_id):
             SELECT c.comment_text,
                    u.first_name || ' ' || u.last_name AS teacher_name
             FROM comments c
-            JOIN users u ON u.user_id = c.teacher_id
+            JOIN users u ON u.user_id = c.user_id
             WHERE c.artwork_id = ?
             ORDER BY c.created_at DESC
             """,

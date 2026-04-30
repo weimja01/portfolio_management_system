@@ -82,6 +82,30 @@ def dashboard():
         search=search
     )
 
+@teacher_bp.route('/grade/<int:artwork_id>', methods=['POST'])
+@teacher_required
+def grade_artwork(artwork_id):
+    """Grade artwork via HTML form submission."""
+    grade = request.form.get('grade')
+    
+    if not grade or not grade.isdigit():
+        flash("Invalid grade. Please enter a number between 0 and 100.", "danger")
+        return redirect(url_for('artworks.detail', artwork_id=artwork_id))
+    
+    grade = int(grade)
+    if grade < 0 or grade > 100:
+        flash("Grade must be between 0 and 100.", "danger")
+        return redirect(url_for('artworks.detail', artwork_id=artwork_id))
+    
+    db = get_db()
+    db.execute(
+        "UPDATE artworks SET grade = ? WHERE artwork_id = ?",
+        (grade, artwork_id)
+    )
+    db.commit()
+    
+    flash(f"Grade of {grade}% saved successfully!", "success")
+    return redirect(url_for('artworks.detail', artwork_id=artwork_id))
 
 @teacher_bp.route('/review/<int:artwork_id>', methods=['GET', 'POST'])
 @teacher_required
