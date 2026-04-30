@@ -194,11 +194,11 @@ def detail(artwork_id):
     # Fetch feedback / comments for this artwork
     feedback = db.execute(
         """
-        SELECT c.*, u.first_name || ' ' || u.last_name AS teacher_name
+        SELECT c.*, u.first_name, u.last_name, u.role
         FROM comments c
-        JOIN users u ON u.user_id = c.teacher_id
+        JOIN users u ON u.user_id = c.user_id
         WHERE c.artwork_id = ?
-        ORDER BY c.created_at DESC
+        ORDER BY c.created_at ASC
         """,
         (artwork_id,)
     ).fetchall()
@@ -209,6 +209,57 @@ def detail(artwork_id):
         feedback=feedback
     )
 
+@artworks_bp.route('/<int:artwork_id>/comment', methods=['POST'])
+@login_required
+def add_comment(artwork_id):
+    """Add a comment to an artwork."""
+    from datetime import datetime
+    
+    comment_text = request.form.get('comment_text', '').strip()
+    
+    if not comment_text:
+        flash("Comment cannot be empty.", "danger")
+        return redirect(url_for('artworks.detail', artwork_id=artwork_id))
+    
+    user_id = session.get('user_id')
+    
+    db = get_db()
+    
+    # Verify artwork exists
+    artwork = db.execute(
+        "SELECT artwork_id FROM artworks WHERE artwork_id = ?",
+        (artwork_id,)
+    ).fetchone()
+    
+    if not artwork:
+        flash("Artwork not found.", "danger")
+        return redirect(url_for('student.dashboard'))
+    
+    try:
+        # Insert comment
+        print(f"\n=== TRYING TO INSERT COMMENT ===")
+        print(f"Artwork ID: {artwork_id}")
+        print(f"User ID: {user_id}")
+        print(f"Comment: {comment_text[:50]}")
+        
+        db.execute(
+            """
+            INSERT INTO comments (artwork_id, user_id, comment_text, created_at)
+            VALUES (?, ?, ?, ?)
+            """,
+            (artwork_id, user_id, comment_text, datetime.utcnow().isoformat())
+        )
+        db.commit()
+        
+        print("=== COMMIT SUCCESSFUL ===\n")
+        
+        flash("Comment added successfully!", "success")
+        
+    except Exception as e:
+        print(f"=== ERROR INSERTING COMMENT: {e} ===\n")
+        flash(f"Error adding comment: {e}", "danger")
+    
+    return redirect(url_for('artworks.detail', artwork_id=artwork_id))
 
 @artworks_bp.route('/<int:artwork_id>/delete', methods=['POST'])
 @student_required

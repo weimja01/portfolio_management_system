@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ artwork.title }} - Portfolio System{% endblock %}
+{% block title %}{{ artwork.title }} - Portfolio Pro{% endblock %}
 
 {% block content %}
 <div class="artwork-detail">
@@ -64,23 +64,45 @@
         </div>
     </div>
 
-    <!-- Teacher Feedback -->
+    <!-- Comments Section -->
     <section class="feedback-section">
-        <h3>Teacher Feedback</h3>
+        <h3>Comments</h3>
         
         {% if feedback %}
             {% for comment in feedback %}
                 <div class="comment">
                     <div class="comment-header">
-                        <strong>{{ comment.teacher_name }}</strong>
-                        <span class="comment-date">{{ comment.created_at[:10] }}</span>
+                        <strong>{{ comment['first_name'] }} {{ comment['last_name'] }}</strong>
+                        {% if comment['role'] == 'teacher' %}
+                            <span class="role-badge teacher">Teacher</span>
+                        {% else %}
+                            <span class="role-badge student">Student</span>
+                        {% endif %}
+                        <span class="comment-date">{{ comment['created_at'][:10] }}</span>
                     </div>
-                    <p class="comment-text">{{ comment.comment_text }}</p>
+                    <p class="comment-text">{{ comment['comment_text'] }}</p>
                 </div>
             {% endfor %}
         {% else %}
-            <p class="empty-state">No feedback yet.</p>
+            <p class="empty-state">No comments yet. Be the first to comment!</p>
         {% endif %}
+        
+        <!-- Add Comment Form -->
+        <div class="comment-form" style="margin-top: 30px;">
+            <h4>Add a Comment</h4>
+            <form action="{{ url_for('artworks.add_comment', artwork_id=artwork['artwork_id']) }}" method="POST">
+                <div class="form-group">
+                    <textarea 
+                        name="comment_text" 
+                        rows="4" 
+                        placeholder="Share your thoughts, ask questions, or provide feedback..." 
+                        required
+                        style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-family: Arial, sans-serif; font-size: 14px; resize: vertical;"
+                    ></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary" style="margin-top: 10px;">Post Comment</button>
+            </form>
+        </div>
     </section>
 
     <div class="back-link">
